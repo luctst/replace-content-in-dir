@@ -11,7 +11,8 @@ test.before("Create the folder to test", t => {
 	}
 });
 
-test("Test", t => {
+test("Test replaceContentInDir", async t => {
+	await replaceContentInDir(join(__dirname, "test"));
 	t.pass();
 });
 
@@ -23,4 +24,8 @@ test.after("Delete the test/ folder", t => {
 	} catch (error) {
 		throw error.message;
 	}
+});
+
+process.on('unhandledRejection', error => {
+	throw error.message;
 });
