@@ -25,7 +25,15 @@
 	"ava": {
 		"cache": true
 	},
-	"keywords": [],
+	"keywords": [
+		"replace-content",
+		"replace-content-in-file",
+		"replace",
+		"replace-in-file",
+		"replace-in-directory",
+		"es6",
+		"nodeJs"
+	],
 	"scripts": {
 		"test": "ava --verbose ./test/*.js",
 		"test:watch": "ava --watch --verbose --fail-fast ./test/*.js",
