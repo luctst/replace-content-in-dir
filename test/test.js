@@ -1,7 +1,7 @@
 import test from "ava";
 import replaceContentInDir from "../lib/index";
 import { join } from "path";
-import {accessSync, rmdirSync, mkdirSync} from "fs";
+import {accessSync, rmdirSync, mkdirSync, readdir} from "fs";
 
 test.before("Create the folder to test", t => {
 	try {
@@ -11,8 +11,8 @@ test.before("Create the folder to test", t => {
 	}
 });
 
-test("Test replaceContentInDir", async t => {
-	await replaceContentInDir(join(__dirname, "test"));
+test("Test replaceContentInDir function", async t => {
+	t.log(await replaceContentInDir("test/test", process.env.PWD));
 	t.pass();
 });
 
