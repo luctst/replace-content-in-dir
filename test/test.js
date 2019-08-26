@@ -12,7 +12,7 @@ test.before("Create the folder to test", t => {
 });
 
 test("Test replaceContentInDir function", async t => {
-	t.log(await replaceContentInDir("test/test", process.env.PWD));
+	await replaceContentInDir(".vscode/", "test/test/");
 	t.pass();
 });
 
