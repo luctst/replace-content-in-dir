@@ -1,20 +1,8 @@
 import test from "ava";
 import replace from "../lib/index";
-import { join } from "path";
-import {rmdirSync, mkdirSync} from "fs";
+import checkErrors from "../lib/utils/checkErrors";
 
-const path = join(__dirname, "test");
-
-test.before("Create the folder to test", t => {
-	try {
-		mkdirSync(path);
-	} catch (error) {
-		rmdirSync(join(__dirname, "test"));
-		throw error.message;
-	}
-});
-
-test.serial("series of tests with replace who should return Error", async t => {
+test("Should throw an error", async t => {
 	await t.throwsAsync(async () => {
 		await replace("");
 	}, {
@@ -44,17 +32,23 @@ test.serial("series of tests with replace who should return Error", async t => {
 	}, {
 		instanceOf: Error
 	}, "Error second argument can't be an empty string");
+
+	await t.throwsAsync(async () => {
+		await replace(".github", "test", []);
+	}, {
+		instanceOf: Error
+	}, "Error third argument must be an object");
 });
 
-test.serial("series of tests with replace who shouldn't return some Errors", async t => {
+test("Shouldn't throw an error", async t => {
 	await t.notThrowsAsync(async () => {
-		await replace(".github");
+		await checkErrors(".github", undefined, {});
 	}, "First argument is correct");
 });
 
-test.serial.skip("Check if with one valid argument return an array with one item", async t => {
+test("One valid argument return an array with one item", async t => {
 	await t.notThrowsAsync(async () => {
-		const f = await replace(".github");
+		const f = await checkErrors(".github", undefined, {});
 
 		if (!Array.isArray(f)) {
 			t.fail("replace must return an array");
@@ -66,11 +60,10 @@ test.serial.skip("Check if with one valid argument return an array with one item
 	});
 });
 
-test.serial.skip("Check if with two valid arguments return an array with two item", async t => {
+test("Two valid arguments return an array with two item", async t => {
 	await t.notThrowsAsync(async () => {
-		const f = await replace(".github", "test");
+		const f = await checkErrors(".github", "test", {});
 
-		t.log(f);
 		if (!Array.isArray(f)) {
 			t.fail("replace must return an array");
 		}
@@ -81,10 +74,7 @@ test.serial.skip("Check if with two valid arguments return an array with two ite
 	});
 });
 
-test.after("Delete the test/ folder", t => {
-	try {
-		rmdirSync(path);
-	} catch (error) {
-		throw error.message;
-	}
+test("To write", async t => {
+	t.log(await replace(".github"));
+	t.pass();
 });
