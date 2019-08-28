@@ -1,6 +1,21 @@
 import test from "ava";
+import { join } from "path";
+import {mkdirSync} from "fs";
 import replace from "../lib/index";
 import checkErrors from "../lib/utils/checkErrors";
+import rimraf from "rimraf";
+import {compare} from "dir-compare";
+
+const path = join(__dirname, "test");
+
+test.before("Create the folder to test", t => {
+	try {
+		mkdirSync(path);
+	} catch (error) {
+		rimraf(path, (err) => err);
+		throw error.message;
+	}
+});
 
 test("Should throw an error", async t => {
 	await t.throwsAsync(async () => {
@@ -74,7 +89,23 @@ test("Two valid arguments return an array with two item", async t => {
 	});
 });
 
-test("To write", async t => {
-	t.log(await replace(".github"));
-	t.pass();
+test("Copy test/folder-a and check if test/test has the same structure without any options", async t => {
+	await replace("test/folder-a", path);
+	const result = await compare(`${path}/`, "test/folder-a", {
+		noDiffSet: false
+	});
+
+	if (result.same) {
+		t.pass("Directories are equal");
+	}
+
+	t.fail("Directories are not equal");
+});
+
+test.after("Delete the test/ folder", t => {
+	try {
+		rimraf(path, err => err);
+	} catch (error) {
+		throw error.message;
+	}
 });
