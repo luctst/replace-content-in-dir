@@ -1,6 +1,6 @@
 import test from "ava";
 import { join } from "path";
-import {mkdirSync} from "fs";
+import {mkdir} from "fs";
 import replace from "../lib/index";
 import checkErrors from "../lib/utils/checkErrors";
 import rimraf from "rimraf";
@@ -8,12 +8,16 @@ import {compare} from "dir-compare";
 
 const path = join(__dirname, "test");
 
-test.before("Create the folder to test", t => {
+test.before.cb("Create the folder to test", t => {
 	try {
-		mkdirSync(path);
+		mkdir(path, (err) => {
+			if (err) throw err;
+			t.end();
+		});
 	} catch (error) {
-		rimraf(path, (err) => err);
-		throw error.message;
+		rimraf(path, err => {
+			if (err) throw err
+		});
 	}
 });
 
@@ -61,7 +65,7 @@ test.serial("Shouldn't throw an error", async t => {
 	}, "First argument is correct");
 });
 
-test("One valid argument return an array with one item", async t => {
+test("checkErrors, one valid argument return an array with one item", async t => {
 	await t.notThrowsAsync(async () => {
 		const f = await checkErrors(".github", undefined, {});
 
@@ -75,7 +79,7 @@ test("One valid argument return an array with one item", async t => {
 	});
 });
 
-test("Two valid arguments return an array with two item", async t => {
+test("checkErrors, two valid arguments return an array with two item", async t => {
 	await t.notThrowsAsync(async () => {
 		const f = await checkErrors(".github", "test", {});
 
@@ -89,19 +93,18 @@ test("Two valid arguments return an array with two item", async t => {
 	});
 });
 
-test.skip("Copy test/folder-a and check if test/test has the same structure without any options", async t => {
+test("Copy test/folder-a and check if test/test has the same structure without any options", async t => {
 	await replace("test/folder-a", path, {});
 	const res = await compare(path, "test/folder-a");
 
-	if (res.same) t.pass();
+	if (res.same) return t.pass();
 
 	t.fail();
 });
 
-test.after("Delete the test/ folder", t => {
-	try {
-		rimraf(path, err => err);
-	} catch (error) {
-		throw error.message;
-	}
+test.after.always.cb("Delete the test/ folder", t => {
+	rimraf(path, err => {
+		if (err) throw err;
+		t.end();
+	});
 });
